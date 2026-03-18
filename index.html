@@ -20,21 +20,6 @@
 
   h1 { font-size: 1.5rem; margin-bottom: 20px; color: #2d3748; }
 
-  #upload-area {
-    background: white;
-    border: 2px dashed #a0aec0;
-    border-radius: 16px;
-    padding: 30px 20px;
-    text-align: center;
-    width: 100%;
-    max-width: 480px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  #upload-area:hover { border-color: #667eea; }
-  #upload-area p { color: #718096; margin-bottom: 12px; }
-  #file-input { display: none; }
-
   .btn {
     display: inline-block;
     padding: 10px 24px;
@@ -48,18 +33,161 @@
   .btn:active { transform: scale(0.97); }
   .btn-primary   { background: #667eea; color: white; }
   .btn-secondary { background: #e2e8f0; color: #4a5568; }
+  .btn-danger    { background: #fc8181; color: white; }
+  .btn-reset     { background: #fff; color: #a0aec0; border: 1px solid #e2e8f0; font-size: 0.82rem; padding: 8px 18px; }
   .btn:hover { opacity: 0.85; }
 
-  #sample-btn {
-    margin-top: 12px;
-    font-size: 0.85rem;
+  /* ===== トップメニュー ===== */
+  #top-menu {
+    display: none;
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+  #top-menu h2 { font-size: 1.1rem; color: #2d3748; margin-bottom: 4px; text-align: center; }
+  #top-menu .list-source {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #a0aec0;
+    margin-bottom: 18px;
+  }
+  #top-menu .list-source span {
+    display: inline-block;
+    background: #edf2ff;
     color: #667eea;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-weight: 600;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .menu-btn-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .menu-btn-wrap .btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1rem;
+    border-radius: 14px;
+    text-align: center;
+  }
+
+  #wrong-count-badge {
+    display: inline-block;
+    background: #fc8181;
+    color: white;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-weight: 700;
+  }
+
+  /* ===== 苦手リストアコーディオン ===== */
+  #wrong-accordion {
+    margin-top: 16px;
+    border: 1px solid #fed7d7;
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+  }
+  #wrong-accordion-toggle {
+    width: 100%;
+    background: #fff5f5;
+    border: none;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #e53e3e;
+  }
+  #wrong-accordion-toggle .toggle-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.25s;
+    color: #fc8181;
+  }
+  #wrong-accordion-toggle.open .toggle-arrow {
+    transform: rotate(180deg);
+  }
+  #wrong-preview {
+    background: #fff5f5;
+    padding: 0 14px;
+    font-size: 0.82rem;
+    color: #718096;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  #wrong-preview.open {
+    max-height: 400px;
+    padding: 0 14px 12px;
+  }
+  #wrong-preview .preview-item {
+    padding: 4px 0;
+    border-bottom: 1px solid #fed7d7;
+  }
+  #wrong-preview .preview-item:last-child { border-bottom: none; }
+  #wrong-preview .clear-btn {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: #a0aec0;
     background: none;
     border: none;
     cursor: pointer;
     text-decoration: underline;
+    display: block;
   }
 
+  /* CSV変更エリア */
+  #top-csv-area {
+    margin-top: 20px;
+    border-top: 1px solid #f0f4f8;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  #top-csv-area p {
+    font-size: 0.78rem;
+    color: #a0aec0;
+    text-align: center;
+  }
+  #top-csv-area .btn {
+    font-size: 0.85rem;
+    padding: 9px 20px;
+    width: 100%;
+    border-radius: 12px;
+  }
+  #file-input { display: none; }
+
+  /* リセットボタン */
+  #reset-to-default-wrap {
+    margin-top: 20px;
+    border-top: 1px solid #f0f4f8;
+    padding-top: 16px;
+    text-align: center;
+  }
+  #reset-to-default-wrap p {
+    font-size: 0.72rem;
+    color: #a0aec0;
+    margin-top: 8px;
+  }
+
+  /* ===== 学習エリア ===== */
   #study-area { display: none; width: 100%; max-width: 480px; }
 
   #progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
@@ -82,7 +210,6 @@
   }
   .mode-btn.active { background: #667eea; color: white; }
 
-  /* カード */
   #card-wrap { perspective: 1000px; margin-bottom: 20px; }
   #card {
     width: 100%; min-height: 220px; position: relative;
@@ -103,19 +230,14 @@
 
   .card-label {
     font-size: 0.75rem; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    opacity: 0.5; margin-bottom: 12px;
+    letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 12px;
   }
   .card-word {
     font-size: 1.9rem; font-weight: 700;
     text-align: center; line-height: 1.3;
   }
-
-  /* 裏面テキスト：hidden-text クラスで非表示 */
   #card-back.hidden-text .card-word,
-  #card-back.hidden-text .card-label {
-    opacity: 0;
-  }
+  #card-back.hidden-text .card-label { opacity: 0; }
 
   #tap-hint { margin-top: 16px; font-size: 0.8rem; color: #a0aec0; text-align: center; }
 
@@ -135,6 +257,7 @@
   #result-area h2 { font-size: 1.4rem; margin-bottom: 8px; }
   #score-text { font-size: 3rem; font-weight: 700; color: #667eea; margin: 12px 0; }
   #result-area p { color: #718096; margin-bottom: 20px; }
+  .result-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 
   #filter-wrap {
     display: flex; justify-content: center;
@@ -166,7 +289,7 @@
   .word-row .ja  { flex: 1; color: #718096; }
   .word-row .status { font-size: 1rem; }
 
-  #reset-btn { display: block; margin: 0 auto 20px; }
+  #back-to-top { display: block; margin: 0 auto 20px; }
 
   @media (max-width: 360px) { .card-word { font-size: 1.5rem; } }
 </style>
@@ -175,23 +298,56 @@
 
 <h1>📖 製品開発 単語帳</h1>
 
-<div id="upload-area" onclick="document.getElementById('file-input').click()">
-  <p>📂 CSVファイルをタップして読み込む</p>
-  <button class="btn btn-primary"
-    onclick="event.stopPropagation(); document.getElementById('file-input').click()">
-    ファイルを選択
-  </button>
-  <br>
-  <button id="sample-btn"
-    onclick="event.stopPropagation(); loadBuiltin()">
-    ▶ 内蔵の単語リストで始める
-  </button>
-  <p style="margin-top:14px; font-size:0.78rem; color:#a0aec0;">
-    CSV形式: 1列目=英語, 2列目=日本語（UTF-8）
-  </p>
-</div>
-<input type="file" id="file-input" accept=".csv,text/csv" onchange="loadCSV(event)">
+<!-- トップメニュー -->
+<div id="top-menu">
+  <h2>📚 学習メニュー</h2>
+  <div class="list-source">使用中のリスト：<span id="list-source-label">内蔵リスト</span></div>
 
+  <div class="menu-btn-wrap">
+    <button class="btn btn-primary" onclick="startStudy('all')">
+      🔀 学習を始める
+    </button>
+    <button class="btn btn-danger" id="wrong-only-btn" onclick="startStudy('wrong')" style="display:none">
+      ❌ 苦手な単語だけ学習
+      <span id="wrong-count-badge">0</span>
+    </button>
+  </div>
+
+  <!-- 苦手リスト アコーディオン -->
+  <div id="wrong-accordion">
+    <button id="wrong-accordion-toggle" onclick="toggleWrongAccordion()">
+      <span id="wrong-accordion-label">❌ 苦手リスト（0件）</span>
+      <span class="toggle-arrow">▼</span>
+    </button>
+    <div id="wrong-preview">
+      <div id="preview-list"></div>
+      <button class="clear-btn" onclick="clearWrongStorage()">🗑 苦手リストをリセット</button>
+    </div>
+  </div>
+
+  <!-- CSV読み込みエリア -->
+  <div id="top-csv-area">
+    <p>別の単語リスト（CSV）を読み込む</p>
+    <button class="btn btn-secondary"
+      onclick="document.getElementById('file-input').click()">
+      📂 CSVファイルを選択
+    </button>
+    <p style="font-size:0.7rem; color:#a0aec0;">
+      形式: 1列目=英語, 2列目=日本語（UTF-8）<br>読み込んだリストは次回以降も自動で使用されます
+    </p>
+  </div>
+  <input type="file" id="file-input" accept=".csv,text/csv" onchange="loadCSV(event)">
+
+  <!-- デフォルトリセット -->
+  <div id="reset-to-default-wrap">
+    <button class="btn btn-reset" onclick="resetToDefault()">
+      🔄 デフォルトの単語リストにリセット
+    </button>
+    <p>保存されたCSVリストを削除し、内蔵リストに戻します</p>
+  </div>
+</div>
+
+<!-- 学習エリア -->
 <div id="study-area">
 
   <div id="mode-wrap">
@@ -233,8 +389,11 @@
     <h2>🎉 お疲れ様でした！</h2>
     <div id="score-text">-</div>
     <p id="result-msg"></p>
-    <button class="btn btn-primary"   onclick="restart(false)" style="margin-right:8px">もう一度</button>
-    <button class="btn btn-secondary" onclick="restart(true)">間違いのみ</button>
+    <div class="result-btns">
+      <button class="btn btn-primary"   onclick="restart(false)">もう一度</button>
+      <button class="btn btn-danger"    onclick="restart(true)" id="retry-wrong-btn">間違いのみ</button>
+      <button class="btn btn-secondary" onclick="goTop()">メニューへ戻る</button>
+    </div>
   </div>
 
   <div id="list-toggle">
@@ -253,10 +412,96 @@
 
   <div id="word-list"></div>
 
-  <button class="btn btn-secondary" id="reset-btn" onclick="resetAll()">🔄 CSVを変更する</button>
+  <button class="btn btn-secondary" id="back-to-top" onclick="goTop()">← メニューへ戻る</button>
 </div>
 
 <script>
+/* =========================================================
+   localStorage キー定義
+========================================================= */
+const LS_WRONG    = 'tangoWrong';
+const LS_CSV      = 'tangoCSV';
+const LS_CSV_NAME = 'tangoCsvName';
+
+/* =========================================================
+   localStorage ユーティリティ
+   ※ プライベートブラウズ等で使用不可の場合に備えてtry-catchで保護
+========================================================= */
+function lsSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn('localStorage.setItem failed:', e);
+  }
+}
+
+function lsGet(key) {
+  try {
+    return localStorage.getItem(key); // 存在しない場合は null を返す
+  } catch (e) {
+    console.warn('localStorage.getItem failed:', e);
+    return null;
+  }
+}
+
+function lsRemove(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {
+    console.warn('localStorage.removeItem failed:', e);
+  }
+}
+
+/* =========================================================
+   苦手リスト localStorage
+========================================================= */
+function saveWrongStorage(wrongSet) {
+  lsSet(LS_WRONG, JSON.stringify([...wrongSet]));
+}
+
+function loadWrongStorage() {
+  try {
+    const s = lsGet(LS_WRONG);
+    if (!s) return new Set();
+    const arr = JSON.parse(s);
+    return new Set(arr.filter(Number.isInteger));
+  } catch {
+    return new Set();
+  }
+}
+
+function clearWrongStorage() {
+  if (!confirm('苦手リストをリセットしますか？')) return;
+  wrongWords = new Set();
+  saveWrongStorage(wrongWords);
+  closeWrongAccordion();
+  updateTopMenu();
+}
+
+/* =========================================================
+   CSV localStorage
+========================================================= */
+function saveCSVStorage(csvText, fileName) {
+  lsSet(LS_CSV,      csvText);
+  lsSet(LS_CSV_NAME, fileName);
+}
+
+function loadCSVStorage() {
+  return lsGet(LS_CSV); // なければ null
+}
+
+function loadCSVNameStorage() {
+  return lsGet(LS_CSV_NAME); // なければ null
+}
+
+function deleteCSVStorage() {
+  lsRemove(LS_CSV);
+  lsRemove(LS_CSV_NAME);
+}
+
+/* =========================================================
+   内蔵 CSV
+========================================================= */
 const BUILTIN_CSV = `english,japanese
 anodize,陽極酸化する
 anodizing,酸化被膜・アルマイト
@@ -299,33 +544,70 @@ clockwise,時計回り
 artifact,人為的な加工物
 supplier,業者`;
 
-let words     = [];
-let deck      = [];
-let current   = 0;
-let mode      = 'en2ja';
-let results   = {};
-let cardModes = [];
-let isFlipped = false;
-let listFilter = 'all';
+/* =========================================================
+   状態変数
+========================================================= */
+let words        = [];
+let deck         = [];
+let current      = 0;
+let mode         = 'en2ja';
+let results      = {};
+let cardModes    = [];
+let isFlipped    = false;
+let listFilter   = 'all';
+let wrongWords   = new Set();
+let studyMode    = 'all';
+let usingBuiltin = true;
+let csvFileName  = '';
 
+/* =========================================================
+   起動時の初期化
+========================================================= */
+window.addEventListener('DOMContentLoaded', () => {
+  const savedCSV = loadCSVStorage();
+  if (savedCSV) {
+    usingBuiltin = false;
+    csvFileName  = loadCSVNameStorage() || 'カスタムCSV';
+    parseCSV(savedCSV);
+  } else {
+    usingBuiltin = true;
+    csvFileName  = '';
+    parseCSV(BUILTIN_CSV);
+  }
+});
+
+/* =========================================================
+   CSV 読み込み（ファイル選択）
+========================================================= */
 function loadCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
+
+  csvFileName = file.name;
+
   const reader = new FileReader();
-  reader.onload = e => parseCSV(e.target.result);
+  reader.onload = e => {
+    const text = e.target.result;
+    usingBuiltin = false;
+    saveCSVStorage(text, csvFileName); // localStorageに保存
+    wrongWords = new Set();
+    saveWrongStorage(wrongWords);
+    parseCSV(text);
+  };
   reader.readAsText(file, 'UTF-8');
+  event.target.value = '';
 }
 
-function loadBuiltin() { parseCSV(BUILTIN_CSV); }
-
+/* =========================================================
+   CSV パース
+========================================================= */
 function parseCSV(text) {
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const lines  = text.split(/\r?\n/).filter(l => l.trim());
   const parsed = [];
   for (let i = 0; i < lines.length; i++) {
     const cols = splitCSVLine(lines[i]);
     if (cols.length < 2) continue;
-    const en = cols[0].trim();
-    const ja = cols[1].trim();
+    const en = cols[0].trim(), ja = cols[1].trim();
     if (i === 0 && /^(english|word|en|term|単語)/i.test(en)) continue;
     if (en && ja) parsed.push({ en, ja });
   }
@@ -334,7 +616,12 @@ function parseCSV(text) {
     return;
   }
   words = parsed;
-  initStudy();
+
+  // 苦手リストを localStorage から復元し、範囲外インデックスを除去
+  wrongWords = loadWrongStorage();
+  wrongWords = new Set([...wrongWords].filter(i => i < words.length));
+
+  showTopMenu();
 }
 
 function splitCSVLine(line) {
@@ -350,23 +637,133 @@ function splitCSVLine(line) {
   return result;
 }
 
-function initStudy() {
-  deck = words.map((_, i) => i);
+/* =========================================================
+   トップメニュー表示・更新
+========================================================= */
+function showTopMenu() {
+  document.getElementById('study-area').style.display = 'none';
+  document.getElementById('top-menu').style.display   = 'block';
+  updateTopMenu();
+}
+
+function updateTopMenu() {
+  // リストソースラベル
+  const label = document.getElementById('list-source-label');
+  if (usingBuiltin) {
+    label.textContent      = '内蔵リスト';
+    label.style.background = '#edf2ff';
+    label.style.color      = '#667eea';
+    label.removeAttribute('title');
+  } else {
+    label.textContent      = csvFileName || 'カスタムCSV';
+    label.style.background = '#fef9e7';
+    label.style.color      = '#d69e2e';
+    label.title            = csvFileName;
+  }
+
+  // デフォルトリセットボタン（内蔵リスト使用中は非表示）
+  document.getElementById('reset-to-default-wrap').style.display =
+    usingBuiltin ? 'none' : 'block';
+
+  // 苦手リスト アコーディオン
+  const cnt         = wrongWords.size;
+  const accordion   = document.getElementById('wrong-accordion');
+  const wrongBtn    = document.getElementById('wrong-only-btn');
+  const badge       = document.getElementById('wrong-count-badge');
+  const accLabel    = document.getElementById('wrong-accordion-label');
+  const previewList = document.getElementById('preview-list');
+
+  if (cnt > 0) {
+    wrongBtn.style.display  = 'block';
+    badge.textContent       = cnt;
+    accordion.style.display = 'block';
+    accLabel.textContent    = `❌ 苦手リスト（${cnt}件）`;
+
+    // プレビュー（最大10件）
+    const items = [...wrongWords].slice(0, 10).map(i =>
+      `<div class="preview-item">${words[i].en} ／ ${words[i].ja}</div>`
+    ).join('');
+    previewList.innerHTML = items +
+      (cnt > 10
+        ? `<div class="preview-item" style="color:#a0aec0">…他 ${cnt - 10} 件</div>`
+        : '');
+  } else {
+    wrongBtn.style.display  = 'none';
+    accordion.style.display = 'none';
+    closeWrongAccordion();
+  }
+}
+
+/* =========================================================
+   苦手リスト アコーディオン 開閉
+========================================================= */
+function toggleWrongAccordion() {
+  const toggle  = document.getElementById('wrong-accordion-toggle');
+  const preview = document.getElementById('wrong-preview');
+  if (toggle.classList.contains('open')) {
+    closeWrongAccordion();
+  } else {
+    toggle.classList.add('open');
+    preview.classList.add('open');
+  }
+}
+
+function closeWrongAccordion() {
+  document.getElementById('wrong-accordion-toggle').classList.remove('open');
+  document.getElementById('wrong-preview').classList.remove('open');
+}
+
+/* =========================================================
+   デフォルトリセット
+========================================================= */
+function resetToDefault() {
+  if (!confirm('保存されたCSVリストを削除し、内蔵の単語リストに戻しますか？\n苦手リストもリセットされます。')) return;
+  deleteCSVStorage();
+  lsRemove(LS_WRONG);
+  wrongWords   = new Set();
+  usingBuiltin = true;
+  csvFileName  = '';
+  parseCSV(BUILTIN_CSV);
+}
+
+/* =========================================================
+   学習開始
+========================================================= */
+function startStudy(sm) {
+  studyMode = sm;
+  if (sm === 'wrong') {
+    if (wrongWords.size === 0) { alert('苦手リストが空です！'); return; }
+    deck = [...wrongWords];
+  } else {
+    deck = words.map((_, i) => i);
+  }
   shuffle(deck);
   current   = 0;
   results   = {};
   cardModes = deck.map(() => Math.random() < 0.5 ? 'en2ja' : 'ja2en');
 
-  document.getElementById('upload-area').style.display = 'none';
+  document.getElementById('top-menu').style.display    = 'none';
   document.getElementById('study-area').style.display  = 'block';
   document.getElementById('result-area').style.display = 'none';
   document.getElementById('word-list').style.display   = 'none';
   document.getElementById('filter-wrap').style.display = 'none';
 
+  document.getElementById('card-back').classList.add('hidden-text');
+  document.getElementById('card').classList.remove('flipped');
+  isFlipped = false;
+
   renderCard();
   renderList();
 }
 
+function goTop() {
+  document.getElementById('study-area').style.display = 'none';
+  showTopMenu();
+}
+
+/* =========================================================
+   モード切替
+========================================================= */
 function setMode(m, btn) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -374,6 +771,9 @@ function setMode(m, btn) {
   renderCard();
 }
 
+/* =========================================================
+   カード描画
+========================================================= */
 function renderCard() {
   if (current >= deck.length) { showResult(); return; }
 
@@ -397,33 +797,15 @@ function renderCard() {
     `${current + 1} / ${total}`;
 }
 
-// ★ カードを表向きに戻しながら次の問題へ移る
-function resetCard(callback) {
-  const card = document.getElementById('card');
-  const back = document.getElementById('card-back');
-
-  // ① 裏面テキストを即座に隠す（アニメーション中に透けて見えないように）
-  back.classList.add('hidden-text');
-
-  // ② カードを表向きに戻す（0.5秒アニメーション）
-  card.classList.remove('flipped');
-  isFlipped = false;
-
-  document.getElementById('answer-btns').classList.remove('show');
-  document.getElementById('tap-hint').style.display = 'block';
-
-  // ③ アニメーション完了後にコールバック（次の問題をセット）
-  setTimeout(callback, 500);
-}
-
+/* =========================================================
+   カードフリップ
+========================================================= */
 function flipCard() {
   if (isFlipped) return;
   isFlipped = true;
 
   const card = document.getElementById('card');
   const back = document.getElementById('card-back');
-
-  // 答えを表示してからフリップ
   back.classList.remove('hidden-text');
   card.classList.add('flipped');
 
@@ -431,9 +813,34 @@ function flipCard() {
   document.getElementById('tap-hint').style.display = 'none';
 }
 
+function resetCard(callback) {
+  const card = document.getElementById('card');
+  const back = document.getElementById('card-back');
+  back.classList.add('hidden-text');
+  card.classList.remove('flipped');
+  isFlipped = false;
+
+  document.getElementById('answer-btns').classList.remove('show');
+  document.getElementById('tap-hint').style.display = 'block';
+  setTimeout(callback, 500);
+}
+
+/* =========================================================
+   回答処理
+========================================================= */
 function answer(correct) {
-  results[deck[current]] = correct;
+  const wordIdx = deck[current];
+  results[wordIdx] = correct;
+
+  if (correct) {
+    wrongWords.delete(wordIdx);
+  } else {
+    wrongWords.add(wordIdx);
+  }
+  saveWrongStorage(wrongWords); // localStorageに保存
+
   renderList();
+
   if (current < deck.length - 1) {
     resetCard(() => { current++; renderCard(); });
   } else {
@@ -443,26 +850,21 @@ function answer(correct) {
 
 function nextCard() {
   if (current < deck.length - 1) {
-    if (isFlipped) {
-      resetCard(() => { current++; renderCard(); });
-    } else {
-      current++; renderCard();
-    }
-  } else {
-    showResult();
-  }
+    if (isFlipped) resetCard(() => { current++; renderCard(); });
+    else { current++; renderCard(); }
+  } else { showResult(); }
 }
 
 function prevCard() {
   if (current > 0) {
-    if (isFlipped) {
-      resetCard(() => { current--; renderCard(); });
-    } else {
-      current--; renderCard();
-    }
+    if (isFlipped) resetCard(() => { current--; renderCard(); });
+    else { current--; renderCard(); }
   }
 }
 
+/* =========================================================
+   結果表示
+========================================================= */
 function showResult() {
   const total   = deck.length;
   const correct = Object.values(results).filter(Boolean).length;
@@ -480,34 +882,45 @@ function showResult() {
   document.getElementById('result-msg').textContent =
     msgs.find(([t]) => pct >= t)[1];
 
+  const hasWrong = Object.values(results).some(v => v === false);
+  document.getElementById('retry-wrong-btn').style.display =
+    hasWrong ? 'inline-block' : 'none';
+
   document.getElementById('progress-bar').style.width  = '100%';
-  document.getElementById('progress-text').textContent = `${deck.length} / ${deck.length}`;
+  document.getElementById('progress-text').textContent = `${total} / ${total}`;
 }
 
+/* =========================================================
+   リスタート
+========================================================= */
 function restart(wrongOnly) {
   document.getElementById('result-area').style.display = 'none';
+
   if (wrongOnly) {
     const wrong = deck.filter(i => results[i] === false);
     deck = wrong.length > 0 ? wrong : words.map((_, i) => i);
   } else {
-    deck = words.map((_, i) => i);
+    deck = studyMode === 'wrong'
+      ? (wrongWords.size > 0 ? [...wrongWords] : words.map((_, i) => i))
+      : words.map((_, i) => i);
   }
+
   shuffle(deck);
   cardModes = deck.map(() => Math.random() < 0.5 ? 'en2ja' : 'ja2en');
   current = 0;
   results = {};
 
-  // リスタート時も裏面を隠してリセット
-  const back = document.getElementById('card-back');
-  const card = document.getElementById('card');
-  back.classList.add('hidden-text');
-  card.classList.remove('flipped');
+  document.getElementById('card-back').classList.add('hidden-text');
+  document.getElementById('card').classList.remove('flipped');
   isFlipped = false;
 
   renderCard();
   renderList();
 }
 
+/* =========================================================
+   単語一覧
+========================================================= */
 function setFilter(f, btn) {
   listFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -518,21 +931,21 @@ function setFilter(f, btn) {
 function renderList() {
   const list = document.getElementById('word-list');
   const rows = words.map((w, i) => {
-    const r = results[i];
-    const statusOk = r === true;
-    const statusNg = r === false;
-    if (listFilter === 'ok'   && !statusOk) return '';
-    if (listFilter === 'ng'   && !statusNg) return '';
+    const r       = results[i];
+    const isWrong = wrongWords.has(i);
+    if (listFilter === 'ok'   && r !== true)     return '';
+    if (listFilter === 'ng'   && r !== false)     return '';
     if (listFilter === 'none' && r !== undefined) return '';
-    const cls    = statusOk ? 'correct-row' : statusNg ? 'wrong-row' : '';
-    const symbol = statusOk ? '⭕' : statusNg ? '❌' : '－';
+    const cls    = r === true ? 'correct-row' : r === false ? 'wrong-row' : '';
+    const symbol = r === true ? '⭕' : r === false ? '❌' : (isWrong ? '⚠️' : '－');
     return `<div class="word-row ${cls}">
       <span class="en">${w.en}</span>
       <span class="ja">${w.ja}</span>
       <span class="status">${symbol}</span>
     </div>`;
   }).join('');
-  list.innerHTML = rows || '<div class="word-row"><span style="color:#a0aec0">該当なし</span></div>';
+  list.innerHTML = rows ||
+    '<div class="word-row"><span style="color:#a0aec0">該当なし</span></div>';
 }
 
 function toggleList() {
@@ -544,13 +957,9 @@ function toggleList() {
   if (show) renderList();
 }
 
-function resetAll() {
-  words = [];
-  document.getElementById('upload-area').style.display = 'block';
-  document.getElementById('study-area').style.display  = 'none';
-  document.getElementById('file-input').value = '';
-}
-
+/* =========================================================
+   ユーティリティ
+========================================================= */
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -560,10 +969,7 @@ function shuffle(arr) {
 
 document.addEventListener('keydown', e => {
   if (document.getElementById('study-area').style.display === 'none') return;
-  if (e.key === ' ' || e.key === 'Enter') {
-    e.preventDefault();
-    if (!isFlipped) flipCard();
-  }
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); if (!isFlipped) flipCard(); }
   if (e.key === 'ArrowRight') { isFlipped ? answer(true)  : nextCard(); }
   if (e.key === 'ArrowLeft')  { isFlipped ? answer(false) : prevCard(); }
 });
