@@ -93,6 +93,27 @@
     font-weight: 700;
   }
 
+  /* ===== モード切替（トップ・学習共通） ===== */
+  #mode-wrap {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  /* ▼ トップメニュー内では少し上に余白を追加 */
+  #top-menu #mode-wrap {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f4f8;
+  }
+  .mode-btn {
+    padding: 6px 16px; border-radius: 999px;
+    border: 2px solid #667eea; background: white;
+    color: #667eea; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .mode-btn.active { background: #667eea; color: white; }
+
   /* ===== 苦手リストアコーディオン ===== */
   #wrong-accordion {
     margin-top: 16px;
@@ -201,21 +222,14 @@
   }
   #progress-text { font-size: 0.85rem; color: #718096; white-space: nowrap; }
 
-  #mode-wrap { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
-  .mode-btn {
-    padding: 6px 16px; border-radius: 999px;
-    border: 2px solid #667eea; background: white;
-    color: #667eea; font-size: 0.85rem; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .mode-btn.active { background: #667eea; color: white; }
-
   #card-wrap { perspective: 1000px; margin-bottom: 20px; }
   #card {
     width: 100%; min-height: 220px; position: relative;
-    transform-style: preserve-3d; transition: transform 0.5s; cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    cursor: pointer;
   }
-  #card.flipped { transform: rotateY(180deg); }
+  #card.flipped { transform: rotateY(-180deg); }
 
   .card-face {
     position: absolute; inset: 0; border-radius: 20px;
@@ -226,7 +240,7 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   }
   #card-front { background: white; }
-  #card-back  { background: #667eea; color: white; transform: rotateY(180deg); }
+  #card-back  { background: #667eea; color: white; transform: rotateY(-180deg); }
 
   .card-label {
     font-size: 0.75rem; font-weight: 700;
@@ -239,11 +253,27 @@
   #card-back.hidden-text .card-word,
   #card-back.hidden-text .card-label { opacity: 0; }
 
-  #tap-hint { margin-top: 16px; font-size: 0.8rem; color: #a0aec0; text-align: center; }
-
-  #answer-btns { display: none; gap: 12px; margin-bottom: 20px; }
-  #answer-btns.show { display: flex; }
-  #answer-btns .btn { flex: 1; font-size: 1.1rem; padding: 14px; }
+  #action-area {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    min-height: 54px;
+  }
+  #reveal-btn {
+    flex: 1;
+    font-size: 1.05rem;
+    padding: 14px;
+    border-radius: 14px;
+  }
+  #answer-btns {
+    display: none;
+    gap: 12px;
+    flex: 1;
+  }
+  #answer-btns.show {
+    display: flex;
+  }
+  #answer-btns .btn { flex: 1; font-size: 1.1rem; padding: 14px; border-radius: 14px; }
   .btn-wrong    { background: #fc8181; color: white; }
   .btn-correct  { background: #68d391; color: white; }
 
@@ -303,6 +333,13 @@
   <h2>📚 学習メニュー</h2>
   <div class="list-source">使用中のリスト：<span id="list-source-label">内蔵リスト</span></div>
 
+  <!-- ▼ mode-wrap をトップメニュー内に移動 -->
+  <div id="mode-wrap">
+    <button class="mode-btn active" onclick="setMode('en2ja', this)">英→日</button>
+    <button class="mode-btn"        onclick="setMode('ja2en', this)">日→英</button>
+    <button class="mode-btn"        onclick="setMode('random', this)">ランダム</button>
+  </div>
+
   <div class="menu-btn-wrap">
     <button class="btn btn-primary" onclick="startStudy('all')">
       🔀 学習を始める
@@ -312,6 +349,7 @@
       <span id="wrong-count-badge">0</span>
     </button>
   </div>
+
 
   <!-- 苦手リスト アコーディオン -->
   <div id="wrong-accordion">
@@ -350,11 +388,7 @@
 <!-- 学習エリア -->
 <div id="study-area">
 
-  <div id="mode-wrap">
-    <button class="mode-btn active" onclick="setMode('en2ja', this)">英→日</button>
-    <button class="mode-btn"        onclick="setMode('ja2en', this)">日→英</button>
-    <button class="mode-btn"        onclick="setMode('random', this)">ランダム</button>
-  </div>
+  <!-- ▼ mode-wrap はトップメニューに移動したため、ここには置かない -->
 
   <div id="progress-wrap">
     <div id="progress-bar-bg"><div id="progress-bar" style="width:0%"></div></div>
@@ -373,11 +407,15 @@
       </div>
     </div>
   </div>
-  <p id="tap-hint">👆 カードをタップして答えを見る</p>
 
-  <div id="answer-btns">
-    <button class="btn btn-wrong"   onclick="answer(false)">❌ 不正解</button>
-    <button class="btn btn-correct" onclick="answer(true)" >⭕ 正解</button>
+  <div id="action-area">
+    <button class="btn btn-primary" id="reveal-btn" onclick="flipCard()">
+      💡 解答を見る
+    </button>
+    <div id="answer-btns">
+      <button class="btn btn-wrong"   onclick="answer(false)">❌ 不正解</button>
+      <button class="btn btn-correct" onclick="answer(true)" >⭕ 正解</button>
+    </div>
   </div>
 
   <div id="nav-btns">
@@ -425,31 +463,18 @@ const LS_CSV_NAME = 'tangoCsvName';
 
 /* =========================================================
    localStorage ユーティリティ
-   ※ プライベートブラウズ等で使用不可の場合に備えてtry-catchで保護
 ========================================================= */
 function lsSet(key, value) {
-  try {
-    localStorage.setItem(key, value);
-  } catch (e) {
-    console.warn('localStorage.setItem failed:', e);
-  }
+  try { localStorage.setItem(key, value); }
+  catch (e) { console.warn('localStorage.setItem failed:', e); }
 }
-
 function lsGet(key) {
-  try {
-    return localStorage.getItem(key); // 存在しない場合は null を返す
-  } catch (e) {
-    console.warn('localStorage.getItem failed:', e);
-    return null;
-  }
+  try { return localStorage.getItem(key); }
+  catch (e) { console.warn('localStorage.getItem failed:', e); return null; }
 }
-
 function lsRemove(key) {
-  try {
-    localStorage.removeItem(key);
-  } catch (e) {
-    console.warn('localStorage.removeItem failed:', e);
-  }
+  try { localStorage.removeItem(key); }
+  catch (e) { console.warn('localStorage.removeItem failed:', e); }
 }
 
 /* =========================================================
@@ -458,18 +483,14 @@ function lsRemove(key) {
 function saveWrongStorage(wrongSet) {
   lsSet(LS_WRONG, JSON.stringify([...wrongSet]));
 }
-
 function loadWrongStorage() {
   try {
     const s = lsGet(LS_WRONG);
     if (!s) return new Set();
     const arr = JSON.parse(s);
     return new Set(arr.filter(Number.isInteger));
-  } catch {
-    return new Set();
-  }
+  } catch { return new Set(); }
 }
-
 function clearWrongStorage() {
   if (!confirm('苦手リストをリセットしますか？')) return;
   wrongWords = new Set();
@@ -485,19 +506,9 @@ function saveCSVStorage(csvText, fileName) {
   lsSet(LS_CSV,      csvText);
   lsSet(LS_CSV_NAME, fileName);
 }
-
-function loadCSVStorage() {
-  return lsGet(LS_CSV); // なければ null
-}
-
-function loadCSVNameStorage() {
-  return lsGet(LS_CSV_NAME); // なければ null
-}
-
-function deleteCSVStorage() {
-  lsRemove(LS_CSV);
-  lsRemove(LS_CSV_NAME);
-}
+function loadCSVStorage()     { return lsGet(LS_CSV); }
+function loadCSVNameStorage() { return lsGet(LS_CSV_NAME); }
+function deleteCSVStorage()   { lsRemove(LS_CSV); lsRemove(LS_CSV_NAME); }
 
 /* =========================================================
    内蔵 CSV
@@ -550,7 +561,7 @@ supplier,業者`;
 let words        = [];
 let deck         = [];
 let current      = 0;
-let mode         = 'en2ja';
+let mode         = 'en2ja';   // ← トップで選んだ値がそのまま学習に引き継がれる
 let results      = {};
 let cardModes    = [];
 let isFlipped    = false;
@@ -582,14 +593,12 @@ window.addEventListener('DOMContentLoaded', () => {
 function loadCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   csvFileName = file.name;
-
   const reader = new FileReader();
   reader.onload = e => {
     const text = e.target.result;
     usingBuiltin = false;
-    saveCSVStorage(text, csvFileName); // localStorageに保存
+    saveCSVStorage(text, csvFileName);
     wrongWords = new Set();
     saveWrongStorage(wrongWords);
     parseCSV(text);
@@ -615,12 +624,9 @@ function parseCSV(text) {
     alert('単語が見つかりませんでした。\nCSV形式: 1列目=英語, 2列目=日本語');
     return;
   }
-  words = parsed;
-
-  // 苦手リストを localStorage から復元し、範囲外インデックスを除去
+  words      = parsed;
   wrongWords = loadWrongStorage();
   wrongWords = new Set([...wrongWords].filter(i => i < words.length));
-
   showTopMenu();
 }
 
@@ -643,11 +649,20 @@ function splitCSVLine(line) {
 function showTopMenu() {
   document.getElementById('study-area').style.display = 'none';
   document.getElementById('top-menu').style.display   = 'block';
+
+  // ▼ トップに戻ったとき mode-wrap を top-menu 内に戻す（念のため）
+  const modeWrap = document.getElementById('mode-wrap');
+  const topMenu  = document.getElementById('top-menu');
+  // wrong-accordion の直前に挿入して位置を固定
+  const anchor = document.getElementById('wrong-accordion');
+  if (modeWrap.parentElement !== topMenu) {
+    topMenu.insertBefore(modeWrap, anchor);
+  }
+
   updateTopMenu();
 }
 
 function updateTopMenu() {
-  // リストソースラベル
   const label = document.getElementById('list-source-label');
   if (usingBuiltin) {
     label.textContent      = '内蔵リスト';
@@ -661,11 +676,9 @@ function updateTopMenu() {
     label.title            = csvFileName;
   }
 
-  // デフォルトリセットボタン（内蔵リスト使用中は非表示）
   document.getElementById('reset-to-default-wrap').style.display =
     usingBuiltin ? 'none' : 'block';
 
-  // 苦手リスト アコーディオン
   const cnt         = wrongWords.size;
   const accordion   = document.getElementById('wrong-accordion');
   const wrongBtn    = document.getElementById('wrong-only-btn');
@@ -678,8 +691,6 @@ function updateTopMenu() {
     badge.textContent       = cnt;
     accordion.style.display = 'block';
     accLabel.textContent    = `❌ 苦手リスト（${cnt}件）`;
-
-    // プレビュー（最大10件）
     const items = [...wrongWords].slice(0, 10).map(i =>
       `<div class="preview-item">${words[i].en} ／ ${words[i].ja}</div>`
     ).join('');
@@ -707,7 +718,6 @@ function toggleWrongAccordion() {
     preview.classList.add('open');
   }
 }
-
 function closeWrongAccordion() {
   document.getElementById('wrong-accordion-toggle').classList.remove('open');
   document.getElementById('wrong-preview').classList.remove('open');
@@ -752,6 +762,7 @@ function startStudy(sm) {
   document.getElementById('card').classList.remove('flipped');
   isFlipped = false;
 
+  setRevealMode();
   renderCard();
   renderList();
 }
@@ -763,12 +774,29 @@ function goTop() {
 
 /* =========================================================
    モード切替
+   ▼ mode-wrap は top-menu 内に固定。mode 変数だけ更新する
 ========================================================= */
 function setMode(m, btn) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderCard();
+  // 学習中にモードが変わった場合もカードを再描画
+  if (document.getElementById('study-area').style.display !== 'none') {
+    renderCard();
+  }
+}
+
+/* =========================================================
+   解答ボタンエリアの表示切り替え
+========================================================= */
+function setRevealMode() {
+  document.getElementById('reveal-btn').style.display = 'block';
+  document.getElementById('answer-btns').classList.remove('show');
+}
+
+function setAnswerMode() {
+  document.getElementById('reveal-btn').style.display = 'none';
+  document.getElementById('answer-btns').classList.add('show');
 }
 
 /* =========================================================
@@ -786,8 +814,7 @@ function renderCard() {
   document.getElementById('front-label').textContent = m === 'en2ja' ? 'ENGLISH' : '日本語';
   document.getElementById('back-label').textContent  = m === 'en2ja' ? '日本語'  : 'ENGLISH';
 
-  document.getElementById('answer-btns').classList.remove('show');
-  document.getElementById('tap-hint').style.display = 'block';
+  setRevealMode();
 
   const answered = Object.keys(results).length;
   const total    = deck.length;
@@ -809,8 +836,7 @@ function flipCard() {
   back.classList.remove('hidden-text');
   card.classList.add('flipped');
 
-  document.getElementById('answer-btns').classList.add('show');
-  document.getElementById('tap-hint').style.display = 'none';
+  setAnswerMode();
 }
 
 function resetCard(callback) {
@@ -820,8 +846,7 @@ function resetCard(callback) {
   card.classList.remove('flipped');
   isFlipped = false;
 
-  document.getElementById('answer-btns').classList.remove('show');
-  document.getElementById('tap-hint').style.display = 'block';
+  setRevealMode();
   setTimeout(callback, 500);
 }
 
@@ -832,12 +857,9 @@ function answer(correct) {
   const wordIdx = deck[current];
   results[wordIdx] = correct;
 
-  if (correct) {
-    wrongWords.delete(wordIdx);
-  } else {
-    wrongWords.add(wordIdx);
-  }
-  saveWrongStorage(wrongWords); // localStorageに保存
+  if (correct) { wrongWords.delete(wordIdx); }
+  else         { wrongWords.add(wordIdx); }
+  saveWrongStorage(wrongWords);
 
   renderList();
 
@@ -914,6 +936,7 @@ function restart(wrongOnly) {
   document.getElementById('card').classList.remove('flipped');
   isFlipped = false;
 
+  setRevealMode();
   renderCard();
   renderList();
 }
