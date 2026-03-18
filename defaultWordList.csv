@@ -1,8 +1,8 @@
 ﻿english,japanese
-anodize,陽極酸化する
+anodize,アルマイトをかける
 anodizing,酸化被膜、アルマイト
 artwork,版下
-ASIC,特定用途向け集積回路
+ASIC,エンジン（特定用途向け集積回路）
 blasted,ブラスト
 brushed,ヘアライン
 caliper,のぎす
@@ -31,7 +31,7 @@ proturusion,出っ張った、凸らせた
 rectangle,長方形、矩形
 rectangular,長方形の
 schematics,基板回路
-staggered,ねじれ型の
+staggered,互い地がに配置した、よろめいた
 stiffness,剛性、硬さ
 streamline,流線形
 thread,ネジ穴
@@ -39,3 +39,4 @@ Quater twenty,1/4-20
 clockwise,時計回り
 artifact,人為的な加工物
 supplier,業者
+indented,面を下げた、インデントした
