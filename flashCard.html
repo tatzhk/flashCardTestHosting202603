@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>単語帳</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+  }
+
+  h1 { font-size: 1.5rem; margin-bottom: 20px; color: #2d3748; }
+
+  #upload-area {
+    background: white;
+    border: 2px dashed #a0aec0;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 480px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #upload-area:hover { border-color: #667eea; }
+  #upload-area p { color: #718096; margin-bottom: 12px; }
+  #file-input { display: none; }
+
+  .btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary   { background: #667eea; color: white; }
+  .btn-secondary { background: #e2e8f0; color: #4a5568; }
+  .btn:hover { opacity: 0.85; }
+
+  #sample-btn {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #667eea;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  #study-area { display: none; width: 100%; max-width: 480px; }
+
+  #progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  #progress-bar-bg {
+    flex: 1; height: 8px; background: #e2e8f0;
+    border-radius: 999px; overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%; background: #667eea;
+    border-radius: 999px; transition: width 0.4s;
+  }
+  #progress-text { font-size: 0.85rem; color: #718096; white-space: nowrap; }
+
+  #mode-wrap { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+  .mode-btn {
+    padding: 6px 16px; border-radius: 999px;
+    border: 2px solid #667eea; background: white;
+    color: #667eea; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .mode-btn.active { background: #667eea; color: white; }
+
+  /* カード */
+  #card-wrap { perspective: 1000px; margin-bottom: 20px; }
+  #card {
+    width: 100%; min-height: 220px; position: relative;
+    transform-style: preserve-3d; transition: transform 0.5s; cursor: pointer;
+  }
+  #card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute; inset: 0; border-radius: 20px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 30px 24px;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  #card-front { background: white; }
+  #card-back  { background: #667eea; color: white; transform: rotateY(180deg); }
+
+  .card-label {
+    font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    opacity: 0.5; margin-bottom: 12px;
+  }
+  .card-word {
+    font-size: 1.9rem; font-weight: 700;
+    text-align: center; line-height: 1.3;
+  }
+
+  /* 裏面テキスト：hidden-text クラスで非表示 */
+  #card-back.hidden-text .card-word,
+  #card-back.hidden-text .card-label {
+    opacity: 0;
+  }
+
+  #tap-hint { margin-top: 16px; font-size: 0.8rem; color: #a0aec0; text-align: center; }
+
+  #answer-btns { display: none; gap: 12px; margin-bottom: 20px; }
+  #answer-btns.show { display: flex; }
+  #answer-btns .btn { flex: 1; font-size: 1.1rem; padding: 14px; }
+  .btn-wrong    { background: #fc8181; color: white; }
+  .btn-correct  { background: #68d391; color: white; }
+
+  #nav-btns { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
+
+  #result-area {
+    display: none; background: white; border-radius: 20px;
+    padding: 30px 24px; text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
+  }
+  #result-area h2 { font-size: 1.4rem; margin-bottom: 8px; }
+  #score-text { font-size: 3rem; font-weight: 700; color: #667eea; margin: 12px 0; }
+  #result-area p { color: #718096; margin-bottom: 20px; }
+
+  #filter-wrap {
+    display: flex; justify-content: center;
+    gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 5px 14px; border-radius: 999px;
+    border: 2px solid #a0aec0; background: white;
+    color: #718096; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn.active { border-color: #667eea; background: #667eea; color: white; }
+
+  #list-toggle { text-align: center; margin-bottom: 10px; }
+  #word-list {
+    display: none; background: white; border-radius: 16px;
+    overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    margin-bottom: 20px; max-height: 400px; overflow-y: auto;
+  }
+  .word-row {
+    display: flex; padding: 12px 16px;
+    border-bottom: 1px solid #f0f4f8;
+    font-size: 0.9rem; align-items: center; gap: 10px;
+  }
+  .word-row:last-child { border-bottom: none; }
+  .word-row.correct-row { background: #f0fff4; }
+  .word-row.wrong-row   { background: #fff5f5; }
+  .word-row .en  { flex: 1; font-weight: 600; }
+  .word-row .ja  { flex: 1; color: #718096; }
+  .word-row .status { font-size: 1rem; }
+
+  #reset-btn { display: block; margin: 0 auto 20px; }
+
+  @media (max-width: 360px) { .card-word { font-size: 1.5rem; } }
+</style>
+</head>
+<body>
+
+<h1>📖 製品開発 単語帳</h1>
+
+<div id="upload-area" onclick="document.getElementById('file-input').click()">
+  <p>📂 CSVファイルをタップして読み込む</p>
+  <button class="btn btn-primary"
+    onclick="event.stopPropagation(); document.getElementById('file-input').click()">
+    ファイルを選択
+  </button>
+  <br>
+  <button id="sample-btn"
+    onclick="event.stopPropagation(); loadBuiltin()">
+    ▶ 内蔵の単語リストで始める
+  </button>
+  <p style="margin-top:14px; font-size:0.78rem; color:#a0aec0;">
+    CSV形式: 1列目=英語, 2列目=日本語（UTF-8）
+  </p>
+</div>
+<input type="file" id="file-input" accept=".csv,text/csv" onchange="loadCSV(event)">
+
+<div id="study-area">
+
+  <div id="mode-wrap">
+    <button class="mode-btn active" onclick="setMode('en2ja', this)">英→日</button>
+    <button class="mode-btn"        onclick="setMode('ja2en', this)">日→英</button>
+    <button class="mode-btn"        onclick="setMode('random', this)">ランダム</button>
+  </div>
+
+  <div id="progress-wrap">
+    <div id="progress-bar-bg"><div id="progress-bar" style="width:0%"></div></div>
+    <span id="progress-text">0 / 0</span>
+  </div>
+
+  <div id="card-wrap">
+    <div id="card" onclick="flipCard()">
+      <div class="card-face" id="card-front">
+        <div class="card-label" id="front-label">ENGLISH</div>
+        <div class="card-word"  id="front-word">-</div>
+      </div>
+      <div class="card-face" id="card-back">
+        <div class="card-label" id="back-label">日本語</div>
+        <div class="card-word"  id="back-word">-</div>
+      </div>
+    </div>
+  </div>
+  <p id="tap-hint">👆 カードをタップして答えを見る</p>
+
+  <div id="answer-btns">
+    <button class="btn btn-wrong"   onclick="answer(false)">❌ 不正解</button>
+    <button class="btn btn-correct" onclick="answer(true)" >⭕ 正解</button>
+  </div>
+
+  <div id="nav-btns">
+    <button class="btn btn-secondary" onclick="prevCard()">← 前へ</button>
+    <button class="btn btn-secondary" onclick="nextCard()">次へ →</button>
+  </div>
+
+  <div id="result-area">
+    <h2>🎉 お疲れ様でした！</h2>
+    <div id="score-text">-</div>
+    <p id="result-msg"></p>
+    <button class="btn btn-primary"   onclick="restart(false)" style="margin-right:8px">もう一度</button>
+    <button class="btn btn-secondary" onclick="restart(true)">間違いのみ</button>
+  </div>
+
+  <div id="list-toggle">
+    <button class="btn btn-secondary"
+      style="font-size:0.85rem; padding:8px 18px" onclick="toggleList()">
+      📋 単語一覧を見る
+    </button>
+  </div>
+
+  <div id="filter-wrap" style="display:none">
+    <button class="filter-btn active" onclick="setFilter('all',  this)">すべて</button>
+    <button class="filter-btn"        onclick="setFilter('ok',   this)">⭕ 正解</button>
+    <button class="filter-btn"        onclick="setFilter('ng',   this)">❌ 不正解</button>
+    <button class="filter-btn"        onclick="setFilter('none', this)">－ 未回答</button>
+  </div>
+
+  <div id="word-list"></div>
+
+  <button class="btn btn-secondary" id="reset-btn" onclick="resetAll()">🔄 CSVを変更する</button>
+</div>
+
+<script>
+const BUILTIN_CSV = `english,japanese
+anodize,陽極酸化する
+anodizing,酸化被膜・アルマイト
+artwork,版下
+ASIC,特定用途向け集積回路
+blasted,ブラスト
+brushed,ヘアライン
+chaliper,のぎす
+chamfer,C面
+channel,海峡・分けられた形状
+circle,円形
+circuler,円形の
+cohesive,密着する
+collision,衝突・不一致
+concave,凹面
+cosmetic,表層的な
+diversion,流用品
+divert,流用
+engraving,彫刻・彫り文字
+halo effect,ハロー効果
+"IP, IPX",防水・防滴性
+knurling,ローレット
+machining,機械加工
+measure,金尺
+molding,金型
+plate(d),メッキ
+procurement,調達
+profile,横顔・輪郭
+protruded,出っ張った・凸らせた
+protrusion,出っ張り・凸部
+rectangle,長方形・矩形
+rectangular,長方形の
+schematics,基板回路
+staggered,ねじれ型の
+stiffness,剛性・硬さ
+streamline,流線形
+thread,ネジ穴
+Quarter twenty,2001年4月20日
+clockwise,時計回り
+artifact,人為的な加工物
+supplier,業者`;
+
+let words     = [];
+let deck      = [];
+let current   = 0;
+let mode      = 'en2ja';
+let results   = {};
+let cardModes = [];
+let isFlipped = false;
+let listFilter = 'all';
+
+function loadCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => parseCSV(e.target.result);
+  reader.readAsText(file, 'UTF-8');
+}
+
+function loadBuiltin() { parseCSV(BUILTIN_CSV); }
+
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const parsed = [];
+  for (let i = 0; i < lines.length; i++) {
+    const cols = splitCSVLine(lines[i]);
+    if (cols.length < 2) continue;
+    const en = cols[0].trim();
+    const ja = cols[1].trim();
+    if (i === 0 && /^(english|word|en|term|単語)/i.test(en)) continue;
+    if (en && ja) parsed.push({ en, ja });
+  }
+  if (parsed.length === 0) {
+    alert('単語が見つかりませんでした。\nCSV形式: 1列目=英語, 2列目=日本語');
+    return;
+  }
+  words = parsed;
+  initStudy();
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+function initStudy() {
+  deck = words.map((_, i) => i);
+  shuffle(deck);
+  current   = 0;
+  results   = {};
+  cardModes = deck.map(() => Math.random() < 0.5 ? 'en2ja' : 'ja2en');
+
+  document.getElementById('upload-area').style.display = 'none';
+  document.getElementById('study-area').style.display  = 'block';
+  document.getElementById('result-area').style.display = 'none';
+  document.getElementById('word-list').style.display   = 'none';
+  document.getElementById('filter-wrap').style.display = 'none';
+
+  renderCard();
+  renderList();
+}
+
+function setMode(m, btn) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCard();
+}
+
+function renderCard() {
+  if (current >= deck.length) { showResult(); return; }
+
+  const idx = deck[current];
+  const w   = words[idx];
+  const m   = (mode === 'random') ? cardModes[current] : mode;
+
+  document.getElementById('front-word').textContent  = m === 'en2ja' ? w.en : w.ja;
+  document.getElementById('back-word').textContent   = m === 'en2ja' ? w.ja : w.en;
+  document.getElementById('front-label').textContent = m === 'en2ja' ? 'ENGLISH' : '日本語';
+  document.getElementById('back-label').textContent  = m === 'en2ja' ? '日本語'  : 'ENGLISH';
+
+  document.getElementById('answer-btns').classList.remove('show');
+  document.getElementById('tap-hint').style.display = 'block';
+
+  const answered = Object.keys(results).length;
+  const total    = deck.length;
+  document.getElementById('progress-bar').style.width =
+    (answered / total * 100) + '%';
+  document.getElementById('progress-text').textContent =
+    `${current + 1} / ${total}`;
+}
+
+// ★ カードを表向きに戻しながら次の問題へ移る
+function resetCard(callback) {
+  const card = document.getElementById('card');
+  const back = document.getElementById('card-back');
+
+  // ① 裏面テキストを即座に隠す（アニメーション中に透けて見えないように）
+  back.classList.add('hidden-text');
+
+  // ② カードを表向きに戻す（0.5秒アニメーション）
+  card.classList.remove('flipped');
+  isFlipped = false;
+
+  document.getElementById('answer-btns').classList.remove('show');
+  document.getElementById('tap-hint').style.display = 'block';
+
+  // ③ アニメーション完了後にコールバック（次の問題をセット）
+  setTimeout(callback, 500);
+}
+
+function flipCard() {
+  if (isFlipped) return;
+  isFlipped = true;
+
+  const card = document.getElementById('card');
+  const back = document.getElementById('card-back');
+
+  // 答えを表示してからフリップ
+  back.classList.remove('hidden-text');
+  card.classList.add('flipped');
+
+  document.getElementById('answer-btns').classList.add('show');
+  document.getElementById('tap-hint').style.display = 'none';
+}
+
+function answer(correct) {
+  results[deck[current]] = correct;
+  renderList();
+  if (current < deck.length - 1) {
+    resetCard(() => { current++; renderCard(); });
+  } else {
+    resetCard(() => showResult());
+  }
+}
+
+function nextCard() {
+  if (current < deck.length - 1) {
+    if (isFlipped) {
+      resetCard(() => { current++; renderCard(); });
+    } else {
+      current++; renderCard();
+    }
+  } else {
+    showResult();
+  }
+}
+
+function prevCard() {
+  if (current > 0) {
+    if (isFlipped) {
+      resetCard(() => { current--; renderCard(); });
+    } else {
+      current--; renderCard();
+    }
+  }
+}
+
+function showResult() {
+  const total   = deck.length;
+  const correct = Object.values(results).filter(Boolean).length;
+  const pct     = Math.round(correct / total * 100);
+
+  document.getElementById('result-area').style.display = 'block';
+  document.getElementById('score-text').textContent    = `${correct} / ${total}`;
+
+  const msgs = [
+    [100, '🏆 完璧です！素晴らしい！'],
+    [ 80, '😊 よくできました！'],
+    [ 60, '📚 もう少し復習しましょう！'],
+    [  0, '💪 間違えた単語を重点的に復習しよう！'],
+  ];
+  document.getElementById('result-msg').textContent =
+    msgs.find(([t]) => pct >= t)[1];
+
+  document.getElementById('progress-bar').style.width  = '100%';
+  document.getElementById('progress-text').textContent = `${deck.length} / ${deck.length}`;
+}
+
+function restart(wrongOnly) {
+  document.getElementById('result-area').style.display = 'none';
+  if (wrongOnly) {
+    const wrong = deck.filter(i => results[i] === false);
+    deck = wrong.length > 0 ? wrong : words.map((_, i) => i);
+  } else {
+    deck = words.map((_, i) => i);
+  }
+  shuffle(deck);
+  cardModes = deck.map(() => Math.random() < 0.5 ? 'en2ja' : 'ja2en');
+  current = 0;
+  results = {};
+
+  // リスタート時も裏面を隠してリセット
+  const back = document.getElementById('card-back');
+  const card = document.getElementById('card');
+  back.classList.add('hidden-text');
+  card.classList.remove('flipped');
+  isFlipped = false;
+
+  renderCard();
+  renderList();
+}
+
+function setFilter(f, btn) {
+  listFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('word-list');
+  const rows = words.map((w, i) => {
+    const r = results[i];
+    const statusOk = r === true;
+    const statusNg = r === false;
+    if (listFilter === 'ok'   && !statusOk) return '';
+    if (listFilter === 'ng'   && !statusNg) return '';
+    if (listFilter === 'none' && r !== undefined) return '';
+    const cls    = statusOk ? 'correct-row' : statusNg ? 'wrong-row' : '';
+    const symbol = statusOk ? '⭕' : statusNg ? '❌' : '－';
+    return `<div class="word-row ${cls}">
+      <span class="en">${w.en}</span>
+      <span class="ja">${w.ja}</span>
+      <span class="status">${symbol}</span>
+    </div>`;
+  }).join('');
+  list.innerHTML = rows || '<div class="word-row"><span style="color:#a0aec0">該当なし</span></div>';
+}
+
+function toggleList() {
+  const list   = document.getElementById('word-list');
+  const filter = document.getElementById('filter-wrap');
+  const show   = list.style.display !== 'block';
+  list.style.display   = show ? 'block' : 'none';
+  filter.style.display = show ? 'flex'  : 'none';
+  if (show) renderList();
+}
+
+function resetAll() {
+  words = [];
+  document.getElementById('upload-area').style.display = 'block';
+  document.getElementById('study-area').style.display  = 'none';
+  document.getElementById('file-input').value = '';
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('study-area').style.display === 'none') return;
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (!isFlipped) flipCard();
+  }
+  if (e.key === 'ArrowRight') { isFlipped ? answer(true)  : nextCard(); }
+  if (e.key === 'ArrowLeft')  { isFlipped ? answer(false) : prevCard(); }
+});
+</script>
+</body>
+</html>
