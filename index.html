@@ -93,14 +93,13 @@
     font-weight: 700;
   }
 
-  /* ===== モード切替（トップ・学習共通） ===== */
+  /* ===== モード切替 ===== */
   #mode-wrap {
     display: flex;
     justify-content: center;
     gap: 8px;
     margin-bottom: 16px;
   }
-  /* ▼ トップメニュー内では少し上に余白を追加 */
   #top-menu #mode-wrap {
     margin-top: 20px;
     padding-top: 16px;
@@ -321,6 +320,25 @@
 
   #back-to-top { display: block; margin: 0 auto 20px; }
 
+  /* ===== ローディング表示 ===== */
+  #loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #718096;
+    font-size: 0.95rem;
+    margin-top: 40px;
+  }
+  #loading .spinner {
+    width: 36px; height: 36px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   @media (max-width: 360px) { .card-word { font-size: 1.5rem; } }
 </style>
 </head>
@@ -328,18 +346,23 @@
 
 <h1>📖 製品開発 単語帳</h1>
 
+<!-- ローディング表示 -->
+<div id="loading">
+  <div class="spinner"></div>
+  <span>単語リストを読み込み中…</span>
+</div>
+
 <!-- トップメニュー -->
 <div id="top-menu">
   <h2>📚 学習メニュー</h2>
   <div class="list-source">使用中のリスト：<span id="list-source-label">内蔵リスト</span></div>
 
-  <!-- ▼ mode-wrap をトップメニュー内に移動 -->
   <div id="mode-wrap">
     <button class="mode-btn active" onclick="setMode('en2ja', this)">英→日</button>
     <button class="mode-btn"        onclick="setMode('ja2en', this)">日→英</button>
     <button class="mode-btn"        onclick="setMode('random', this)">ランダム</button>
   </div>
-
+ 
   <div class="menu-btn-wrap">
     <button class="btn btn-primary" onclick="startStudy('all')">
       🔀 学習を始める
@@ -387,8 +410,6 @@
 
 <!-- 学習エリア -->
 <div id="study-area">
-
-  <!-- ▼ mode-wrap はトップメニューに移動したため、ここには置かない -->
 
   <div id="progress-wrap">
     <div id="progress-bar-bg"><div id="progress-bar" style="width:0%"></div></div>
@@ -511,57 +532,12 @@ function loadCSVNameStorage() { return lsGet(LS_CSV_NAME); }
 function deleteCSVStorage()   { lsRemove(LS_CSV); lsRemove(LS_CSV_NAME); }
 
 /* =========================================================
-   内蔵 CSV
-========================================================= */
-const BUILTIN_CSV = `english,japanese
-anodize,陽極酸化する
-anodizing,酸化被膜・アルマイト
-artwork,版下
-ASIC,特定用途向け集積回路
-blasted,ブラスト
-brushed,ヘアライン
-caliper,のぎす
-chamfer,C面
-channel,海峡・分けられた形状
-circle,円形
-circuler,円形の
-cohesive,密着する
-collision,衝突・不一致
-concave,凹面
-cosmetic,表層的な
-diversion,流用品
-divert,流用
-engraving,彫刻・彫り文字
-halo effect,ハロー効果
-"IP, IPX",防水・防滴性
-knurling,ローレット
-machining,機械加工
-measure,金尺
-molding,金型
-plate(d),メッキ
-procurement,調達
-profile,横顔・輪郭
-protruded,出っ張った・凸らせた
-protrusion,出っ張り・凸部
-rectangle,長方形・矩形
-rectangular,長方形の
-schematics,基板回路
-staggered,ねじれ型の
-stiffness,剛性・硬さ
-streamline,流線形
-thread,ネジ穴
-Quarter twenty,1/4-20
-clockwise,時計回り
-artifact,人為的な加工物
-supplier,業者`;
-
-/* =========================================================
    状態変数
 ========================================================= */
 let words        = [];
 let deck         = [];
 let current      = 0;
-let mode         = 'en2ja';   // ← トップで選んだ値がそのまま学習に引き継がれる
+let mode         = 'en2ja';
 let results      = {};
 let cardModes    = [];
 let isFlipped    = false;
@@ -572,20 +548,57 @@ let usingBuiltin = true;
 let csvFileName  = '';
 
 /* =========================================================
-   起動時の初期化
+   ローディング表示制御
 ========================================================= */
-window.addEventListener('DOMContentLoaded', () => {
+function showLoading() {
+  document.getElementById('loading').style.display  = 'flex';
+  document.getElementById('top-menu').style.display = 'none';
+}
+function hideLoading() {
+  document.getElementById('loading').style.display  = 'none';
+}
+
+/* =========================================================
+   起動時の初期化
+   ▼ localStorageにカスタムCSVがあればそちらを優先し、
+     なければ fetch で defaultWordList.csv を読み込む
+========================================================= */
+window.addEventListener('DOMContentLoaded', async () => {
+  showLoading();
+
   const savedCSV = loadCSVStorage();
   if (savedCSV) {
+    // カスタムCSVが保存済み
     usingBuiltin = false;
     csvFileName  = loadCSVNameStorage() || 'カスタムCSV';
     parseCSV(savedCSV);
   } else {
-    usingBuiltin = true;
-    csvFileName  = '';
-    parseCSV(BUILTIN_CSV);
+    // デフォルトCSVをfetchで読み込む
+    await fetchDefaultCSV();
   }
 });
+
+/* =========================================================
+   defaultWordList.csv を fetch で読み込む
+========================================================= */
+async function fetchDefaultCSV() {
+  try {
+    const res = await fetch('defaultWordList.csv');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    usingBuiltin = true;
+    csvFileName  = '';
+    parseCSV(text);
+  } catch (e) {
+    hideLoading();
+    alert(
+      'デフォルトの単語リスト（defaultWordList.csv）の読み込みに失敗しました。\n\n' +
+      'HTMLファイルと同じフォルダに defaultWordList.csv を配置してください。\n\n' +
+      '（ローカルファイルとして直接開いている場合は、ローカルサーバー経由でアクセスしてください）'
+    );
+    console.error('fetchDefaultCSV error:', e);
+  }
+}
 
 /* =========================================================
    CSV 読み込み（ファイル選択）
@@ -627,6 +640,7 @@ function parseCSV(text) {
   words      = parsed;
   wrongWords = loadWrongStorage();
   wrongWords = new Set([...wrongWords].filter(i => i < words.length));
+  hideLoading();
   showTopMenu();
 }
 
@@ -650,11 +664,9 @@ function showTopMenu() {
   document.getElementById('study-area').style.display = 'none';
   document.getElementById('top-menu').style.display   = 'block';
 
-  // ▼ トップに戻ったとき mode-wrap を top-menu 内に戻す（念のため）
   const modeWrap = document.getElementById('mode-wrap');
   const topMenu  = document.getElementById('top-menu');
-  // wrong-accordion の直前に挿入して位置を固定
-  const anchor = document.getElementById('wrong-accordion');
+  const anchor   = document.getElementById('wrong-accordion');
   if (modeWrap.parentElement !== topMenu) {
     topMenu.insertBefore(modeWrap, anchor);
   }
@@ -725,15 +737,17 @@ function closeWrongAccordion() {
 
 /* =========================================================
    デフォルトリセット
+   ▼ localStorageのカスタムCSVを削除し、fetchで再読み込み
 ========================================================= */
-function resetToDefault() {
-  if (!confirm('保存されたCSVリストを削除し、内蔵の単語リストに戻しますか？\n苦手リストもリセットされます。')) return;
+async function resetToDefault() {
+  if (!confirm('保存されたCSVリストを削除し、デフォルトの単語リストに戻しますか？\n苦手リストもリセットされます。')) return;
   deleteCSVStorage();
   lsRemove(LS_WRONG);
   wrongWords   = new Set();
   usingBuiltin = true;
   csvFileName  = '';
-  parseCSV(BUILTIN_CSV);
+  showLoading();
+  await fetchDefaultCSV();
 }
 
 /* =========================================================
@@ -774,13 +788,11 @@ function goTop() {
 
 /* =========================================================
    モード切替
-   ▼ mode-wrap は top-menu 内に固定。mode 変数だけ更新する
 ========================================================= */
 function setMode(m, btn) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // 学習中にモードが変わった場合もカードを再描画
   if (document.getElementById('study-area').style.display !== 'none') {
     renderCard();
   }
