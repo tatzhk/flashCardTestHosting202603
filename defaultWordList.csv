@@ -1,43 +1,46 @@
-english,japanese
-anodize,アルマイトをかける
-anodizing,酸化被膜、アルマイト
-artifact,人為的な加工物
-artwork,版下
-ASIC,エンジン（特定用途向け集積回路）
-blasted,ブラスト
-brushed,ヘアライン
-chaliper,のぎす
-chamfer,C面
-channel,海峡、分けられた形状
-circle,円形
-circuler,円形の
-clockwise,時計回り
-cohesive,密着する
-collision,衝突、不一致
-concave,凹面
-cosmetic,表層的な
-diversion,流用品
-divert,流用
-engraving,彫刻、彫り文字
-halo effect,ハロー効果
-indentation,凹み、下げ面、インデント
-"IP, IPX",防水・防滴性
-knurling,ローレット
-machining,機械加工
-measure,金尺
-molding,成形
-plate(d),メッキ
-procurement,調達
-profile,輪郭、外形、横顔
-protruded,出っ張った、凸らせた
-protrusion,出っ張り、凸
-Quater twenty,1/4-20（三脚穴）
-rectangle,長方形、矩形
-rectangular,長方形の
-schematics,基板回路
-staggered,互い違いの、よろめいた
-stiffness,剛性、硬さ
-streamline,流線形
-supplier,業者
-thread,ネジ穴
-tooling,金型
+english,japanese,,分類,
+anodize,アルマイトをかける,動詞,加工法,
+anodizing,酸化被膜、アルマイト,名詞,加工法,
+artifact,人為的な加工物,名詞,設計,
+artwork,版下,名詞,プロセス,
+ASIC,エンジン（特定用途向け集積回路）,名詞,仕様,application specific integrated circuit
+blasted,ブラスト,名詞,加工法,
+brushed,ヘアライン,名詞,加工法,
+chaliper,のぎす,名詞,道具,
+chamfer,C面,名詞,造形,
+channel,海峡、分けられた形状,名詞,造形,
+circle,円形,名詞,造形,
+circuler,円形の,形容詞,造形,
+clockwise,時計回り,名詞,プロセス,
+cohesive,密着する,形容詞,状態,
+collision,衝突、不一致,名詞,状態,
+concave,凹面,名詞,造形,
+cosmetic,表層的な,名詞,設計,
+diversion,流用品,名詞,設計,
+divert,流用,動詞,設計,
+engraving,彫刻、彫り文字,名詞,加工法,
+halo effect,ハロー効果,名詞,マーケティング,
+indentation,凹み、下げ面、インデント,名詞,造形,
+"IP, IPX",防水・防滴性,固有名詞,仕様,
+knurling,ローレット,名詞,加工法,
+machining,機械加工,名詞,加工法,
+measure,金尺,名詞,道具,
+molding,成形,名詞,加工法,
+plate(d),メッキ,名詞/動詞,加工法,
+procurement,調達,名詞,プロセス,
+profile,輪郭、外形、横顔,名詞,造形,
+protruded,出っ張った、凸らせた,過去分詞,造形,
+proturusion,出っ張り、凸,名詞,造形,
+Quater twenty,1/4-20（三脚穴）,名詞,設計,
+rectangle,長方形、矩形,名詞,造形,
+rectangular,長方形の,形容詞,造形,
+schematics,基板回路,名詞,設計,
+staggered,互い違いの、よろめいた,名詞,造形,
+stiffness,剛性、硬さ,名詞,設計,
+streamline,流線形,名詞,造形,
+supplier,業者,名詞,プロセス,
+thread,ネジ穴,名詞,設計,
+tooling,金型,名詞,加工法,
+recurring meeting,定期的な会議設定,名詞,プロセス,
+abbreviation,略語,名詞,プロセス,
+
